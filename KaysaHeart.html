@@ -1,14 +1,28 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>KaysaLove</title>
-  <link rel="stylesheet" href="./style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"> <!-- Viewport meta tag -->
+    <title>KaysaLove</title>
+    <link rel="stylesheet" href="./style.css">
+    <style>
+        /* Adding styles for responsive design */
+        html, body {
+            height: 100%;
+            margin: 0; /* Remove default margin */
+            overflow: hidden; /* Prevent scrollbars from appearing */
+        }
 
+        #heart {
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            display: block; /* Removes any default inline spacing */
+            touch-action: none; /* Prevents zooming and scrolling */
+        }
+    </style>
 </head>
 <body>
-<canvas id="heart"></canvas>
-  <script  src="./script.js"></script>
-
+    <canvas id="heart"></canvas>
+    <script src="./script.js"></script>
 </body>
 </html>
