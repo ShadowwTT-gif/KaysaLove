@@ -40,12 +40,14 @@
             loaded = true;
 
             var mobile = window.isDevice;
-            var koef = mobile ? 0.3 : 1; // Zoom out more for mobile
+            var koef = mobile ? 0.5 : 1;
             var canvas = document.getElementById('heart');
             var ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth * 2; // Increase canvas width for higher resolution
-            canvas.height = window.innerHeight * 2; // Increase canvas height for higher resolution
-            ctx.scale(2, 2); // Scale up the drawing context to maintain resolution
+            var width = canvas.width = koef * window.innerWidth;
+            var height = canvas.height = koef * window.innerHeight;
+
+            ctx.fillStyle = "rgba(0,0,0,1)";
+            ctx.fillRect(0, 0, width, height);
 
             // Display "Kaysa" and fade-out animation
             var opacity = 1.0; // Initial opacity
@@ -55,15 +57,15 @@
 
             var fadeOutText = function () {
                 ctx.fillStyle = `rgba(0, 0, 0, 0.1)`; // Dim the background slightly
-                ctx.fillRect(0, 0, canvas.width, canvas.height); // Clear and apply fading
+                ctx.fillRect(0, 0, width, height); // Clear and apply fading
                 ctx.fillStyle = `rgba(128, 0, 128, ${opacity})`; // Purple fading text
-                ctx.fillText("Kaysa", canvas.width / 2, canvas.height / 2);
+                ctx.fillText("Kaysa", width / 2, height / 2); // Center the text
 
                 opacity -= 0.02; // Reduce opacity gradually
                 if (opacity > 0) {
                     window.requestAnimationFrame(fadeOutText);
                 } else {
-                    startHeartAnimation(ctx, canvas.width, canvas.height, koef); // Start the heart animation after fade-out
+                    startHeartAnimation(ctx, width, height, koef); // Start the heart animation after fade-out
                 }
             };
 
@@ -79,7 +81,6 @@
                     -(15 * Math.cos(rad) - 5 * Math.cos(2 * rad) - 2 * Math.cos(3 * rad) - Math.cos(4 * rad))
                 ];
             };
-
             var scaleAndTranslate = function (pos, sx, sy, dx, dy) {
                 return [dx + pos[0] * sx, dy + pos[1] * sy];
             };
@@ -88,12 +89,13 @@
             var pointsOrigin = [];
             var dr = koef < 1 ? 0.3 : 0.1;
 
-            for (let i = 0; i < Math.PI * 2; i += dr) pointsOrigin.push(scaleAndTranslate(heartPosition(i), 210, 13, 0, 0));
-            for (let i = 0; i < Math.PI * 2; i += dr) pointsOrigin.push(scaleAndTranslate(heartPosition(i), 150, 9, 0, 0));
-            for (let i = 0; i < Math.PI * 2; i += dr) pointsOrigin.push(scaleAndTranslate(heartPosition(i), 90, 5, 0, 0));
-            var heartPointsCount = pointsOrigin.length;
+            for (let i = 0; i < Math.PI * 2; i += dr) pointsOrigin.push(scaleAndTranslate(heartPosition(i), 210, 13, width / 2, height / 2)); // Centered
+            for (let i = 0; i < Math.PI * 2; i += dr) pointsOrigin.push(scaleAndTranslate(heartPosition(i), 150, 9, width / 2, height / 2)); // Centered
+            for (let i = 0; i < Math.PI * 2; i += dr) pointsOrigin.push(scaleAndTranslate(heartPosition(i), 90, 5, width / 2, height / 2)); // Centered
 
+            var heartPointsCount = pointsOrigin.length;
             var targetPoints = [];
+
             var pulse = function (kx, ky) {
                 for (let i = 0; i < pointsOrigin.length; i++) {
                     targetPoints[i] = [
@@ -115,9 +117,10 @@
                     q: ~~(rand() * heartPointsCount),
                     D: 2 * (i % 2) - 1,
                     force: 0.2 * rand() + 0.7,
-                    f: `hsla(270, ${~~(40 * rand() + 60)}%, ${~~(60 * rand() + 20)}%, .3)`, // Purple heart particles
-                    trace: Array.from({ length: traceCount }, () => ({ x: x, y: y }))
+                    f: "hsla(270," + ~~(40 * rand() + 60) + "%," + ~~(60 * rand() + 20) + "%,.3)", // Purple heart particles
+                    trace: []
                 };
+                for (var k = 0; k < traceCount; k++) e[i].trace[k] = { x: x, y: y };
             }
 
             var config = {
@@ -140,11 +143,11 @@
                     var dx = u.trace[0].x - q[0];
                     var dy = u.trace[0].y - q[1];
                     var length = Math.sqrt(dx * dx + dy * dy);
-                    if (length < 10) {
-                        if (rand() < 0.95) {
+                    if (10 > length) {
+                        if (0.95 < rand()) {
                             u.q = ~~(rand() * heartPointsCount);
                         } else {
-                            if (rand() < 0.99) {
+                            if (0.99 < rand()) {
                                 u.D *= -1;
                             }
                             u.q += u.D;
@@ -160,15 +163,14 @@
                     u.trace[0].y += u.vy;
                     u.vx *= u.force;
                     u.vy *= u.force;
-
-                    for (let k = 0; k < u.trace.length - 1;) {
+                    for (var k = 0; k < u.trace.length - 1;) {
                         var T = u.trace[k];
                         var N = u.trace[++k];
                         N.x -= config.traceK * (N.x - T.x);
                         N.y -= config.traceK * (N.y - T.y);
                     }
                     ctx.fillStyle = u.f;
-                    for (let k = 0; k < u.trace.length; k++) {
+                    for (k = 0; k < u.trace.length; k++) {
                         ctx.fillRect(u.trace[k].x, u.trace[k].y, 1, 1);
                     }
                 }
@@ -179,7 +181,6 @@
             loop();
         };
 
-        // Initialize the canvas and animations when the DOM is ready
         var s = document.readyState;
         if (s === 'complete' || s === 'loaded' || s === 'interactive') init();
         else document.addEventListener('DOMContentLoaded', init, false);
