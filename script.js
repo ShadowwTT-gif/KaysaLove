@@ -20,18 +20,19 @@ var init = function () {
     loaded = true;
 
     var mobile = window.isDevice;
-    var koef = mobile ? 0.5 : 1;
     var canvas = document.getElementById('heart');
     var ctx = canvas.getContext('2d');
-    var width = canvas.width = koef * window.innerWidth;
-    var height = canvas.height = koef * window.innerHeight;
+
+    // Set canvas dimensions to full viewport size
+    var width = canvas.width = window.innerWidth;
+    var height = canvas.height = window.innerHeight;
 
     ctx.fillStyle = "rgba(0,0,0,1)";
     ctx.fillRect(0, 0, width, height);
 
     // Display "Kaysa" and fade-out animation
     var opacity = 1.0; // Initial opacity
-    ctx.font = `${koef * 100}px 'Brush Script MT', cursive`;
+    ctx.font = `${mobile ? 50 : 100}px 'Brush Script MT', cursive`; // Adjust font size for mobile
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
@@ -39,20 +40,20 @@ var init = function () {
         ctx.fillStyle = `rgba(0, 0, 0, 0.1)`; // Dim the background slightly
         ctx.fillRect(0, 0, width, height); // Clear and apply fading
         ctx.fillStyle = `rgba(128, 0, 128, ${opacity})`; // Purple fading text
-        ctx.fillText("Kaysa", width / 2, height / 2);
+        ctx.fillText("Kaysa", width / 2, height / 2); // Center text
 
         opacity -= 0.02; // Reduce opacity gradually
         if (opacity > 0) {
             window.requestAnimationFrame(fadeOutText);
         } else {
-            startHeartAnimation(ctx, width, height, koef); // Start the heart animation after fade-out
+            startHeartAnimation(ctx, width, height); // Start the heart animation after fade-out
         }
     };
 
     fadeOutText(); // Start the fade-out effect
 };
 
-var startHeartAnimation = function (ctx, width, height, koef) {
+var startHeartAnimation = function (ctx, width, height) {
     var rand = Math.random;
 
     var heartPosition = function (rad) {
@@ -66,9 +67,9 @@ var startHeartAnimation = function (ctx, width, height, koef) {
         return [dx + pos[0] * sx, dy + pos[1] * sy];
     };
 
-    var traceCount = koef < 1 ? 20 : 50;
+    var traceCount = 50; // Set trace count
     var pointsOrigin = [];
-    var dr = koef < 1 ? 0.3 : 0.1;
+    var dr = 0.1; // Angle increment
 
     // Create heart shape points
     for (let i = 0; i < Math.PI * 2; i += dr) {
@@ -178,6 +179,7 @@ var startHeartAnimation = function (ctx, width, height, koef) {
     loop();
 };
 
+// Initialize the canvas on page load
 var s = document.readyState;
 if (s === 'complete' || s === 'loaded' || s === 'interactive') init();
 else document.addEventListener('DOMContentLoaded', init, false);
