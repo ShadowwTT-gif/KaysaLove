@@ -75,6 +75,7 @@
         var startHeartAnimation = function (ctx, width, height, koef) {
             var rand = Math.random;
 
+            // Heart shape calculations
             var heartPosition = function (rad) {
                 return [
                     Math.pow(Math.sin(rad), 3),
@@ -89,9 +90,20 @@
             var pointsOrigin = [];
             var dr = koef < 1 ? 0.3 : 0.1;
 
-            for (let i = 0; i < Math.PI * 2; i += dr) pointsOrigin.push(scaleAndTranslate(heartPosition(i), 210, 13, width / 2, height / 2)); // Centered
-            for (let i = 0; i < Math.PI * 2; i += dr) pointsOrigin.push(scaleAndTranslate(heartPosition(i), 150, 9, width / 2, height / 2)); // Centered
-            for (let i = 0; i < Math.PI * 2; i += dr) pointsOrigin.push(scaleAndTranslate(heartPosition(i), 90, 5, width / 2, height / 2)); // Centered
+            // Center the heart
+            var heartCenterX = width / 2;
+            var heartCenterY = height / 2;
+
+            // Generate heart points
+            for (let i = 0; i < Math.PI * 2; i += dr) {
+                pointsOrigin.push(scaleAndTranslate(heartPosition(i), 210, 13, heartCenterX, heartCenterY)); // Large heart
+            }
+            for (let i = 0; i < Math.PI * 2; i += dr) {
+                pointsOrigin.push(scaleAndTranslate(heartPosition(i), 150, 9, heartCenterX, heartCenterY)); // Medium heart
+            }
+            for (let i = 0; i < Math.PI * 2; i += dr) {
+                pointsOrigin.push(scaleAndTranslate(heartPosition(i), 90, 5, heartCenterX, heartCenterY)); // Small heart
+            }
 
             var heartPointsCount = pointsOrigin.length;
             var targetPoints = [];
@@ -99,8 +111,8 @@
             var pulse = function (kx, ky) {
                 for (let i = 0; i < pointsOrigin.length; i++) {
                     targetPoints[i] = [
-                        kx * pointsOrigin[i][0] + width / 2,
-                        ky * pointsOrigin[i][1] + height / 2
+                        kx * pointsOrigin[i][0] + heartCenterX,
+                        ky * pointsOrigin[i][1] + heartCenterY
                     ];
                 }
             };
