@@ -40,11 +40,12 @@
             loaded = true;
 
             var mobile = window.isDevice;
-            var koef = mobile ? 0.5 : 1;
+            var koef = mobile ? 0.3 : 1; // Zoom out more for mobile
             var canvas = document.getElementById('heart');
             var ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth; // Set canvas width to full viewport
-            canvas.height = window.innerHeight; // Set canvas height to full viewport
+            canvas.width = window.innerWidth * 2; // Increase canvas width for higher resolution
+            canvas.height = window.innerHeight * 2; // Increase canvas height for higher resolution
+            ctx.scale(2, 2); // Scale up the drawing context to maintain resolution
 
             // Display "Kaysa" and fade-out animation
             var opacity = 1.0; // Initial opacity
