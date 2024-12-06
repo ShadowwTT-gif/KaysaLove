@@ -56,35 +56,49 @@ var startHeartAnimation = function (ctx, width, height, koef) {
     var rand = Math.random;
 
     var heartPosition = function (rad) {
-        return [Math.pow(Math.sin(rad), 3), -(15 * Math.cos(rad) - 5 * Math.cos(2 * rad) - 2 * Math.cos(3 * rad) - Math.cos(4 * rad))];
+        return [
+            Math.pow(Math.sin(rad), 3),
+            -(15 * Math.cos(rad) - 5 * Math.cos(2 * rad) - 2 * Math.cos(3 * rad) - Math.cos(4 * rad))
+        ];
     };
+
     var scaleAndTranslate = function (pos, sx, sy, dx, dy) {
         return [dx + pos[0] * sx, dy + pos[1] * sy];
     };
 
     var traceCount = koef < 1 ? 20 : 50;
     var pointsOrigin = [];
-    var i;
     var dr = koef < 1 ? 0.3 : 0.1;
 
-    for (i = 0; i < Math.PI * 2; i += dr) pointsOrigin.push(scaleAndTranslate(heartPosition(i), 210, 13, 0, 0));
-    for (i = 0; i < Math.PI * 2; i += dr) pointsOrigin.push(scaleAndTranslate(heartPosition(i), 150, 9, 0, 0));
-    for (i = 0; i < Math.PI * 2; i += dr) pointsOrigin.push(scaleAndTranslate(heartPosition(i), 90, 5, 0, 0));
+    // Create heart shape points
+    for (let i = 0; i < Math.PI * 2; i += dr) {
+        pointsOrigin.push(scaleAndTranslate(heartPosition(i), 210, 13, 0, 0));
+    }
+    for (let i = 0; i < Math.PI * 2; i += dr) {
+        pointsOrigin.push(scaleAndTranslate(heartPosition(i), 150, 9, 0, 0));
+    }
+    for (let i = 0; i < Math.PI * 2; i += dr) {
+        pointsOrigin.push(scaleAndTranslate(heartPosition(i), 90, 5, 0, 0));
+    }
+
     var heartPointsCount = pointsOrigin.length;
 
+    // Set target points based on the heart shape
     var targetPoints = [];
     var pulse = function (kx, ky) {
-        for (i = 0; i < pointsOrigin.length; i++) {
-            targetPoints[i] = [];
-            targetPoints[i][0] = kx * pointsOrigin[i][0] + width / 2;
-            targetPoints[i][1] = ky * pointsOrigin[i][1] + height / 2;
+        for (let i = 0; i < pointsOrigin.length; i++) {
+            targetPoints[i] = [
+                kx * pointsOrigin[i][0] + width / 2, // Centered on canvas
+                ky * pointsOrigin[i][1] + height / 2  // Centered on canvas
+            ];
         }
     };
 
     var e = [];
-    for (i = 0; i < heartPointsCount; i++) {
-        var x = rand() * width;
-        var y = rand() * height;
+    // Initialize particles for heart animation
+    for (let i = 0; i < heartPointsCount; i++) {
+        var x = width / 2; // Start particles at the center
+        var y = height / 2; // Start particles at the center
         e[i] = {
             vx: 0,
             vy: 0,
@@ -96,7 +110,9 @@ var startHeartAnimation = function (ctx, width, height, koef) {
             f: "hsla(270," + ~~(40 * rand() + 60) + "%," + ~~(60 * rand() + 20) + "%,.3)", // Purple heart particles
             trace: []
         };
-        for (var k = 0; k < traceCount; k++) e[i].trace[k] = { x: x, y: y };
+        for (var k = 0; k < traceCount; k++) {
+            e[i].trace[k] = { x: x, y: y }; // Keep trace positions at center
+        }
     }
 
     var config = {
@@ -113,18 +129,20 @@ var startHeartAnimation = function (ctx, width, height, koef) {
         ctx.fillStyle = "rgba(0,0,0,0.1)";
         ctx.fillRect(0, 0, width, height);
 
-        for (i = e.length; i--;) {
+        for (let i = e.length; i--;) {
             var u = e[i];
             var q = targetPoints[u.q];
             var dx = u.trace[0].x - q[0];
             var dy = u.trace[0].y - q[1];
             var length = Math.sqrt(dx * dx + dy * dy);
-            if (10 > length) {
-                if (0.95 < rand()) {
+
+            // Check if particle is near the target point
+            if (length < 10) {
+                if (rand() < 0.95) {
                     u.q = ~~(rand() * heartPointsCount);
                 } else {
-                    if (0.99 < rand()) {
-                        u.D *= -1;
+                    if (rand() < 0.99) {
+                        u.D *= -1; // Randomly reverse direction
                     }
                     u.q += u.D;
                     u.q %= heartPointsCount;
@@ -133,20 +151,23 @@ var startHeartAnimation = function (ctx, width, height, koef) {
                     }
                 }
             }
+
             u.vx += -dx / length * u.speed;
             u.vy += -dy / length * u.speed;
             u.trace[0].x += u.vx;
             u.trace[0].y += u.vy;
             u.vx *= u.force;
             u.vy *= u.force;
-            for (var k = 0; k < u.trace.length - 1;) {
+
+            for (let k = 0; k < u.trace.length - 1;) {
                 var T = u.trace[k];
                 var N = u.trace[++k];
                 N.x -= config.traceK * (N.x - T.x);
                 N.y -= config.traceK * (N.y - T.y);
             }
+
             ctx.fillStyle = u.f;
-            for (k = 0; k < u.trace.length; k++) {
+            for (let k = 0; k < u.trace.length; k++) {
                 ctx.fillRect(u.trace[k].x, u.trace[k].y, 1, 1);
             }
         }
