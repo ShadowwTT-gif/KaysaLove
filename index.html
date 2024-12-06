@@ -3,88 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kaysa Swirl Animation</title>
+    <title>Heart Animation</title>
     <style>
         body {
-            background-color: black;
             margin: 0;
             overflow: hidden;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            background: black;
         }
-
-        .container {
-            position: relative;
-            width: 500px;
-            height: 500px;
-        }
-
-        .line {
-            position: absolute;
-            width: 4px;
-            height: 100px;
-            background: linear-gradient(90deg, violet, purple, indigo);
-            animation: swirl 4s ease-in-out forwards;
-            border-radius: 2px;
-        }
-
-        .text {
-            position: absolute;
-            color: transparent;
-            font-family: 'Arial', sans-serif;
-            font-size: 4rem;
-            font-weight: bold;
-            background: linear-gradient(90deg, violet, purple, indigo);
-            background-clip: text;
-            -webkit-background-clip: text;
-            animation: textAppear 5s ease-in-out forwards 3.5s;
-            opacity: 0;
-        }
-
-        @keyframes swirl {
-            0% {
-                transform: rotate(0deg) translateX(250px) rotate(0deg);
-                opacity: 1;
-            }
-            80% {
-                opacity: 1;
-            }
-            100% {
-                transform: rotate(360deg) translateX(0) rotate(-360deg);
-                opacity: 0;
-            }
-        }
-
-        @keyframes textAppear {
-            0% {
-                opacity: 0;
-                transform: scale(0.8);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
+        #heart {
+            display: block;
         }
     </style>
 </head>
 <body>
-    <div class="container" id="swirl-container">
-        <div class="text">Kaysa</div>
-    </div>
-
-    <script>
-        // Generate 45 lines dynamically
-        const container = document.getElementById('swirl-container');
-
-        for (let i = 0; i < 45; i++) {
-            const line = document.createElement('div');
-            line.classList.add('line');
-            line.style.transform = `rotate(${(i * 360) / 45}deg) translateX(250px) rotate(-${(i * 360) / 45}deg)`;
-            line.style.animationDelay = `${Math.random() * 1}s`;
-            container.appendChild(line);
-        }
-    </script>
+    <canvas id="heart"></canvas>
+    <script src="script.js"></script>
 </body>
 </html>
